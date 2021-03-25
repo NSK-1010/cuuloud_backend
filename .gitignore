@@ -1,0 +1,16 @@
+/__pycache__/*
+/.vscode/*
+/bin/*
+/Include/*
+/include/*
+/Lib/*
+/lib/*
+/lib64
+/lib64/*
+/logs/*
+/migrations/*
+/*/__pycache__/*
+/Scripts/*
+/share/*sk
+/pyvenv.cfg
+/static/images/*
