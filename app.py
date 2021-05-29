@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-from flask import Flask
+from model import *
+from flask import Flask, session
 from flask_session import Session
 from engine import init_db
 import os
@@ -10,11 +11,11 @@ async_mode = None
 
 def create_app():
 
-    app = Flask(__name__, static_folder='static', static_url_path='')
+    app = Flask(__name__, static_folder='../dist/static', static_url_path='/static', template_folder='../dist')
 
     #SECRET_KEY
-    app.config['SECRET_KEY'] = os.urandom(24)
-
+    app.config['SECRET_KEY'] = b'p\x80\xccR\x99\x1f\x0f\xb8\x97\x8e\xe0L\x1b\x14^?'
+    
     #Flask Config
     app.config.from_object('engine.DevelopmentConfig')
 
@@ -25,11 +26,12 @@ def create_app():
 
     #database.py
     init_db(app)
+    
+    #Flask session
+    app.config['SESSION_TYPE'] = 'filesystem'
 
     return app
 
 app = create_app()
-
-Session(app)
 
 socketio = SocketIO(app, async_mode=async_mode, manage_session=False)

@@ -7,7 +7,7 @@ class Room(db.Model):
     name = db.Column(db.Unicode(length=255))
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.now)
 
-    __tablename__ = 'user'
+    __tablename__ = 'room'
 
 
 class RoomSchema(ma.Schema):

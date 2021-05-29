@@ -3,12 +3,12 @@ from datetime import datetime
 
 
 class Join(db.Model):
-    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.String(length=255), primary_key=True, unique=True)
-    room_id = db.Column(db.String(length=255), primary_key=True, unique=True)
+    id = db.Column(db.BigInteger, primary_key=True, autoincrement=True, unique=True)
+    user_id = db.Column(db.String(length=255), primary_key=True)
+    room_id = db.Column(db.String(length=255), primary_key=True)
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.now)
 
-    __tablename__ = 'user'
+    __tablename__ = 'join'
 
 
 class JoinSchema(ma.Schema):
