@@ -16,8 +16,9 @@ class RoomNameSpace(Namespace):
         room_schema = RoomSchema(many=False)
         my_join_rooms = [room_schema.dump(Room.query.filter(Room.id == r.room_id).first()) for r in my_join_data]
         emit('joinned_rooms', my_join_rooms)
-        room_schema = RoomSchema(many=True)
-        emit('rooms', room_schema.dump(Room.query.all()))
+        if session.get('login'):
+            room_schema = RoomSchema(many=True)
+            emit('rooms', room_schema.dump(Room.query.all()))
 
     def on_disconnect(self):
         my_join = Join.query.filter(Join.user_id == session.get('id')).all()
@@ -28,7 +29,7 @@ class RoomNameSpace(Namespace):
             emit('leaving', {'id': session.get("id"), 'room':join.room_id}, room=join.room_id)
 
     def on_create_room(self, payload):
-        if not session.get('id'):
+        if not session.get('login'):
             emit('error', {'message': 'You need to log in.'})
             return
         name = payload.get('name')

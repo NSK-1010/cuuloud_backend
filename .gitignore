@@ -9,6 +9,7 @@
 /lib64/*
 /logs/*
 /migrations/*
+/flask_session/
 /flask_session/*
 /*/__pycache__/*
 /Scripts/*
