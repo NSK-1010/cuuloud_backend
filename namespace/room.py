@@ -28,12 +28,19 @@ class RoomNameSpace(Namespace):
             leave_room(join.room_id)
             emit('leaving', {'id': session.get("id"), 'room':join.room_id}, room=join.room_id)
     
-    def on_get_all_rooms():
+    def on_get_all_rooms(self):
         if not session.get('login'):
             emit('error', {'message': 'You need to log in.'})
             return
         room_schema = RoomSchema(many=True)
         emit('rooms', room_schema.dump(Room.query.all()))
+        my_join_data = Join.query.filter(
+            Join.user_id == session.get('id')).all()
+        for r in my_join_data:
+            join_room(r.room_id)
+        room_schema = RoomSchema(many=False)
+        my_join_rooms = [room_schema.dump(Room.query.filter(Room.id == r.room_id).first()) for r in my_join_data]
+        emit('joinned_rooms', my_join_rooms)
 
     def on_create_room(self, payload):
         if not session.get('login'):
