@@ -8,7 +8,7 @@ def index():
 
 @app.route('/favicon.ico')
 def favicon():
-    return send_file('../dist/favicon.ico')
+    return send_file('../dist/favicon.png')
 
 socketio.on_namespace(auth.AuthNameSpace('/auth'))
 socketio.on_namespace(room.RoomNameSpace('/room'))
