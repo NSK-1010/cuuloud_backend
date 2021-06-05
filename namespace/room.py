@@ -4,7 +4,9 @@ from engine import db
 from model import Room, RoomSchema, Join, User, Invite
 from app import app, session
 from flask_session import Session
+import datetime
 Session(app)
+
 
 class RoomNameSpace(Namespace):
     def on_connect(self):
@@ -14,7 +16,8 @@ class RoomNameSpace(Namespace):
         for r in my_join_data:
             join_room(r.room_id)
         room_schema = RoomSchema(many=False)
-        my_join_rooms = [room_schema.dump(Room.query.filter(Room.id == r.room_id).first()) for r in my_join_data]
+        my_join_rooms = [room_schema.dump(Room.query.filter(
+            Room.id == r.room_id).first()) for r in my_join_data]
         emit('joinned_rooms', my_join_rooms)
         if session.get('login'):
             room_schema = RoomSchema(many=True)
@@ -26,8 +29,9 @@ class RoomNameSpace(Namespace):
             return
         for join in my_join:
             leave_room(join.room_id)
-            emit('leaving', {'id': session.get("id"), 'room':join.room_id}, room=join.room_id)
-    
+            emit('leaving', {'id': session.get("id"),
+                 'room': join.room_id}, room=join.room_id)
+
     def on_get_all_rooms(self):
         if not session.get('login'):
             emit('error', {'message': 'You need to log in.'})
@@ -39,7 +43,8 @@ class RoomNameSpace(Namespace):
         for r in my_join_data:
             join_room(r.room_id)
         room_schema = RoomSchema(many=False)
-        my_join_rooms = [room_schema.dump(Room.query.filter(Room.id == r.room_id).first()) for r in my_join_data]
+        my_join_rooms = [room_schema.dump(Room.query.filter(
+            Room.id == r.room_id).first()) for r in my_join_data]
         emit('joinned_rooms', my_join_rooms)
 
     def on_create_room(self, payload):
@@ -71,7 +76,8 @@ class RoomNameSpace(Namespace):
         if not target:
             emit('error', {'error': 'That room is not found.'})
             return
-        my_join = Join.query.filter(Join.user_id == session.get('id'), Join.room_id == room).first()
+        my_join = Join.query.filter(Join.user_id == session.get(
+            'id'), Join.room_id == room).first()
         if my_join:
             return
         new_join = Join(user_id=session.get('id'), room_id=room)
@@ -102,3 +108,7 @@ class RoomNameSpace(Namespace):
             Join.user_id == session.get('id'), Join.room_id == room).all
         schema = RoomSchema(many=True)
         emit('joinned_rooms', {'rooms': schema.dump(my_join_rooms)})
+
+    def on_message(self, payload):
+        emit('message', {'message': payload.get('text'), 'room': payload.get(
+            "id"), 'created_at': datetime.datetime.now().isoformat()}, room=payload.get('id'))

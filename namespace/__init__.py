@@ -1,7 +1,6 @@
-from . import auth, chat, room
+from . import auth, room
 
 __all__ = [
     'auth',
-    'chat',
     'room'
 ]
