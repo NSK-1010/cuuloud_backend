@@ -12,4 +12,3 @@ def favicon():
 
 socketio.on_namespace(auth.AuthNameSpace('/auth'))
 socketio.on_namespace(room.RoomNameSpace('/room'))
-socketio.on_namespace(chat.ChatNameSpace('/chat'))
