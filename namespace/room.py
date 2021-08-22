@@ -64,6 +64,7 @@ class RoomNameSpace(Namespace):
         my_join_rooms = Join.query.filter(
             Join.user_id == session.get('id'), Join.room_id == room).all()
         room_schema = RoomSchema(many=True)
+        emit('rooms', room_schema.dump(Room.query.all()), broadcast=True)
         emit('joinned_rooms', {'rooms': room_schema.dump(my_join_rooms)})
 
     def on_join_room(self, payload):
