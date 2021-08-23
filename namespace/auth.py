@@ -14,7 +14,6 @@ class AuthNameSpace(Namespace):
         pass
     
     def on_login(self, payload):
-        print(payload)
         if session.get('login'):
             return
         session['login'] = False
