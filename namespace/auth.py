@@ -65,7 +65,7 @@ class AuthNameSpace(Namespace):
         if not target:
             emit('notice', {'message': 'You are not invited.'})
             return
-        new = User(name=name, email=email, password=password)
+        new = User(id=payload.get('id'), name=name, email=email, password=password)
         db.session.add(new)
         session['id'] = payload.get('id')
         session['login'] = True
