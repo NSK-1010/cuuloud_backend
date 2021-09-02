@@ -19,7 +19,7 @@ class AuthNameSpace(Namespace):
         session['login'] = False
         target = User.query.filter(User.id == payload.get('id')).first()
         if (not target) or (not crypt.check(payload.get('password'), target.password)):
-            emit('error', {'message': 'This is wrong ID or password.'})
+            emit('error', {'message': 'IDかパスワードが間違っています。'})
             return
         session['id'] = payload.get('id')
         session['login'] = True
@@ -36,12 +36,12 @@ class AuthNameSpace(Namespace):
 
     def on_invite(self, payload):
         if not session.get('login'):
-            emit('error', {'message': 'You need to log in.'})
+            emit('error', {'message': 'ログインが必要です。'})
             return
         target = Invite.query.filter(
             Invite.email == payload.get('email')).first()
         if target:
-            emit('notice', {'message': 'This email has already invited.'})
+            emit('notice', {'message': 'このメールアドレスはすでに招待されています。'})
             return
         email = payload.get("email")
         new = Invite(user_id=session.get('id'), email=email)
@@ -54,7 +54,7 @@ class AuthNameSpace(Namespace):
             return
         target = User.query.filter(User.id == payload.get('id')).first()
         if target:
-            emit('notice', {'message': 'This ID has already found.'})
+            emit('notice', {'message': '登録しようとしているIDがすでに存在します。'})
             return
         del target
         name = payload.get("name")
@@ -62,7 +62,7 @@ class AuthNameSpace(Namespace):
         password = crypt.hash(payload.get("password"))
         target = Invite.query.filter(Invite.email == email).first()
         if not target:
-            emit('notice', {'message': 'You are not invited.'})
+            emit('notice', {'message': 'あなたは招待されていません。'})
             return
         new = User(id=payload.get('id'), name=name, email=email, password=password)
         db.session.add(new)

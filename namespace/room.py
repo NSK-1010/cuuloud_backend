@@ -32,7 +32,7 @@ class RoomNameSpace(Namespace):
 
     def on_get_all_rooms(self):
         if not session.get('login'):
-            emit('error', {'message': 'You need to log in.'})
+            emit('error', {'message': 'ログインが必要です'})
             return
         room_schema = RoomSchema(many=True)
         emit('rooms', room_schema.dump(Room.query.all()))
@@ -47,7 +47,7 @@ class RoomNameSpace(Namespace):
 
     def on_create_room(self, payload):
         if not session.get('login'):
-            emit('error', {'message': 'You need to log in.'})
+            emit('error', {'message': 'ログインが必要です。'})
             return
         name = payload.get('name')
         room = randomstr.randomstr(20)
@@ -71,7 +71,7 @@ class RoomNameSpace(Namespace):
 
     def on_join_room(self, payload):
         if not session.get('login'):
-            emit('status', {'error': 'You need to log in.'})
+            emit('status', {'error': 'ログインが必要です。'})
             return
         room = payload.get('room')
         target = Room.query.filter(Room.id == room).first()
@@ -96,7 +96,7 @@ class RoomNameSpace(Namespace):
 
     def on_leave_room(self, payload):
         if not session.get('login'):
-            emit('error', {'message': 'You need to log in.'})
+            emit('error', {'message': 'ログインが必要です。'})
             return
         room = payload.get('room')
         my_join = Join.query.filter(Join.user_id == session.get(
