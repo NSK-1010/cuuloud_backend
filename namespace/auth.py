@@ -8,7 +8,8 @@ Session(app)
 class AuthNameSpace(Namespace):
     def on_connect(self):
         print('connected(auth)')
-        emit('login', {'login': session.get('login'), 'id': session.get('id')})
+        target = User.query.filter(User.id == session.get('id')).first()
+        emit('login', {'login': session.get('login'), 'id': session.get('id'), 'name':target.name})
 
     def on_disconnect(self):
         pass
@@ -26,7 +27,7 @@ class AuthNameSpace(Namespace):
         my_join_rooms = Join.query.filter(
             Join.user_id == session.get('id')).all()
         schema = RoomSchema(many=True)
-        emit('login', {'login': session.get('login'), 'id': session.get('id')})
+        emit('login', {'login': session.get('login'), 'id': session.get('id'), 'name':target.name})
         emit('rooms', {'ids': schema.dump(my_join_rooms)})
 
     def on_logout(self):
