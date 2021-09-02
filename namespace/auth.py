@@ -45,6 +45,9 @@ class AuthNameSpace(Namespace):
             emit('notice', {'message': 'このメールアドレスはすでに招待されています。'})
             return
         email = payload.get("email")
+        if email.count('@') != 1 or email.split('@')[-1].count('.') == 0:
+            emit('notice', {'message': '不正なメールアドレスです。'})
+            return
         new = Invite(user_id=session.get('id'), email=email)
         db.session.add(new)
         db.session.commit()
