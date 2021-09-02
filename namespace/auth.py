@@ -51,7 +51,7 @@ class AuthNameSpace(Namespace):
         new = Invite(user_id=session.get('id'), email=email)
         db.session.add(new)
         db.session.commit()
-        emit('invited', {'email': email})
+        emit('notice', {'message': '招待が完了しました。'})
 
     def on_register(self, payload):
         if not payload.get('id').isascii():
