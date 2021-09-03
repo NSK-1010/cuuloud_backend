@@ -39,13 +39,14 @@ class AuthNameSpace(Namespace):
         if not session.get('login'):
             emit('error', {'message': 'ログインが必要です。'})
             return
-        target = Invite.query.filter(
-            Invite.email == payload.get('email')).first()
-        if target:
+        if User.query.filter(User.email == payload.get("email")).first():
+            emit('notice', {'message': 'このメールアドレスはすでに登録されています。'})
+            return
+        if Invite.query.filter(Invite.email == payload.get('email')).first():
             emit('notice', {'message': 'このメールアドレスはすでに招待されています。'})
             return
-        email = payload.get("email")
-        if email.count('@') != 1 or email.split('@')[-1].count('.') == 0:
+        email = payload.get("email") if payload.get("email") else ''
+        if not (email.count('@') == 1 and email.split('@')[-1].count('.') != 0):
             emit('notice', {'message': '不正なメールアドレスです。'})
             return
         new = Invite(user_id=session.get('id'), email=email)
@@ -56,19 +57,19 @@ class AuthNameSpace(Namespace):
     def on_register(self, payload):
         if not payload.get('id').isascii():
             return
-        target = User.query.filter(User.id == payload.get('id')).first()
-        if target:
+        if User.query.filter(User.id == payload.get('id')).first():
             emit('notice', {'message': '登録しようとしているIDがすでに存在します。'})
             return
-        del target
-        name = payload.get("name")
-        email = payload.get("email")
-        password = crypt.hash(payload.get("password"))
-        target = Invite.query.filter(Invite.email == email).first()
+        if User.query.filter(User.email == payload.get("email")).first():
+            emit('notice', {'message': 'このメールアドレスはすでに登録されています。'})
+            return
+        target = Invite.query.filter(Invite.email == payload.get("email")).first()
         if not target:
             emit('notice', {'message': 'あなたは招待されていません。'})
             return
-        new = User(id=payload.get('id'), name=name, email=email, password=password)
+        password = crypt.hash(payload.get("password"))
+        new = User(id=payload.get('id'), name=payload.get("name"), email=payload.get("email"), password=password)
+        db.session.delete(target)
         db.session.add(new)
         session['id'] = payload.get('id')
         session['login'] = True
