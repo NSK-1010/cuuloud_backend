@@ -7,7 +7,7 @@ class User(db.Model):
     password = db.Column(db.String(length=255))
     name = db.Column(db.Unicode(length=255))
     email = db.Column(db.Unicode(length=255), unique=True)
-    icon = db.Column(db.Unicode(length=255), unique=True)
+    icon = db.Column(db.Unicode(length=255))
     
     invitation_times_limit = db.Column(db.Integer)
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.now)
@@ -17,4 +17,4 @@ class User(db.Model):
 
 class UserSchema(ma.Schema):
     class Meta:
-        fields = ("id", "name", "created_at")
+        fields = ("id", "name", "icon", "created_at")
