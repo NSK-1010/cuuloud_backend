@@ -49,6 +49,11 @@ class AuthNameSpace(Namespace):
         if not (email.count('@') == 1 and email.split('@')[-1].count('.') != 0):
             emit('notice', {'message': '不正なメールアドレスです。'})
             return
+        invited_person = User.query.filter(User.id == session.get('id')).first()
+        if invited_person.invitation_times_limit <= 0:
+            emit('notice', {'message': '招待可能回数を超過しました。'})
+            return
+        invited_person.invitation_times_limit -= 1
         new = Invite(user_id=session.get('id'), email=email)
         db.session.add(new)
         db.session.commit()
