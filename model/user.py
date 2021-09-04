@@ -9,7 +9,7 @@ class User(db.Model):
     email = db.Column(db.Unicode(length=255), unique=True)
     icon = db.Column(db.Unicode(length=255))
     
-    invitation_times_limit = db.Column(db.Integer)
+    invitation_times_limit = db.Column(db.Integer, default=3)
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.now)
 
     __tablename__ = 'user'
