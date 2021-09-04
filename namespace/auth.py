@@ -8,8 +8,11 @@ Session(app)
 class AuthNameSpace(Namespace):
     def on_connect(self):
         print('connected(auth)')
-        target = User.query.filter(User.id == session.get('id')).first()
-        emit('login', {'login': session.get('login'), 'id': session.get('id'), 'name':target.name})
+        if session.get('login'):
+            target = User.query.filter(User.id == session.get('id')).first()
+            emit('login', {'login': session.get('login'), 'id': session.get('id'), 'name':target.name})
+        else:
+            emit('login', {'login': False, 'id': None, 'name':None})
 
     def on_disconnect(self):
         pass
@@ -20,7 +23,7 @@ class AuthNameSpace(Namespace):
         session['login'] = False
         target = User.query.filter(User.id == payload.get('id')).first()
         if (not target) or (not crypt.check(payload.get('password'), target.password)):
-            emit('error', {'message': 'IDかパスワードが間違っています。'})
+            emit('login_error', {'message': 'IDかパスワードが間違っています。'})
             return
         session['id'] = payload.get('id')
         session['login'] = True
@@ -37,7 +40,7 @@ class AuthNameSpace(Namespace):
 
     def on_invite(self, payload):
         if not session.get('login'):
-            emit('error', {'message': 'ログインが必要です。'})
+            emit('notice', {'message': 'ログインが必要です。'})
             return
         if User.query.filter(User.email == payload.get("email")).first():
             emit('notice', {'message': 'このメールアドレスはすでに登録されています。'})
@@ -63,14 +66,14 @@ class AuthNameSpace(Namespace):
         if not payload.get('id').isascii():
             return
         if User.query.filter(User.id == payload.get('id')).first():
-            emit('notice', {'message': '登録しようとしているIDがすでに存在します。'})
+            emit('login_error', {'message': '登録しようとしているIDがすでに存在します。'})
             return
         if User.query.filter(User.email == payload.get("email")).first():
-            emit('notice', {'message': 'このメールアドレスはすでに登録されています。'})
+            emit('login_error', {'message': 'このメールアドレスはすでに登録されています。'})
             return
         target = Invite.query.filter(Invite.email == payload.get("email")).first()
         if not target:
-            emit('notice', {'message': 'あなたは招待されていません。'})
+            emit('login_error', {'message': 'あなたは招待されていません。'})
             return
         password = crypt.hash(payload.get("password"))
         new = User(id=payload.get('id'), name=payload.get("name"), email=payload.get("email"), password=password)
@@ -78,5 +81,6 @@ class AuthNameSpace(Namespace):
         db.session.add(new)
         session['id'] = payload.get('id')
         session['login'] = True
-        emit('registed', {'id': session['id']})
         db.session.commit()
+        emit('notice', {'message': '登録完了しました。ようこそ！'})
+        emit('login', {'login': session.get('login'), 'id': payload.get('id'), 'name':payload.get("name")})
