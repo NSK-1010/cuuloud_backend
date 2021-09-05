@@ -62,8 +62,8 @@ class RoomNameSpace(Namespace):
         db.session.add(new_join)
         db.session.commit()
         join_room(room)
-        emit('join', {'user_id': session.get('id'), 'user_name': User.query.filter(
-            User.id == session.get('id')).first().name, 'created_at': datetime.datetime.now().isoformat(), 'room': room}, room=room)
+        emit('join', {'user_id': session.get('id'), 'text':None, 'user_name': User.query.filter(
+            User.id == session.get('id')).first().name, 'created_at': datetime.datetime.now().isoformat(), 'room_id': room}, room=room)
         my_join_data = Join.query.filter(Join.user_id == session.get('id')).all()
         room_schema = RoomSchema(many=False)
         my_join_rooms = [room_schema.dump(Room.query.filter(
@@ -96,7 +96,7 @@ class RoomNameSpace(Namespace):
         my_join_rooms = [room_schema.dump(Room.query.filter(
             Room.id == r.room_id).first()) for r in my_join_data]
         emit('joinned_rooms', my_join_rooms)
-        emit('join', {'room': room, 'created_at': datetime.datetime.now().isoformat(), 'user_id': session.get('id'), 'user_name': User.query.filter(
+        emit('join', {'room_id': room, 'created_at': datetime.datetime.now().isoformat(), 'text':None, 'user_id': session.get('id'), 'user_name': User.query.filter(
             User.id == session.get('id')).first().name}, room=room)
 
     def on_leave_room(self, payload):
@@ -111,7 +111,7 @@ class RoomNameSpace(Namespace):
             return
         db.session.delete(my_join)
         leave_room(room)
-        emit('leave', {'room': room, 'created_at': datetime.datetime.now().isoformat(), 'user_id': session.get('id'), 'user_name': User.query.filter(
+        emit('leave', {'room_id': room, 'created_at': datetime.datetime.now().isoformat(), 'text':None, 'user_id': session.get('id'), 'user_name': User.query.filter(
             User.id == session.get('id')).first().name}, room=room)
         db.session.commit()
         my_join_data = Join.query.filter(Join.user_id == session.get('id')).all()
@@ -128,7 +128,7 @@ class RoomNameSpace(Namespace):
 
     def on_message(self, payload):
         if not payload.get('text').split():
-            emit('notice', {'message': '部屋の名前を入力してください。'})
+            emit('notice', {'message': '発言を入力してください。'})
             return
         emit('message', {'text': payload.get('text'), 'room_id': payload.get(
             "id"), 'created_at': datetime.datetime.now().isoformat(), 'user_id': session.get('user_id'), 'user_name': User.query.filter(User.id == session.get('id')).first().name}, room=payload.get('id'))
