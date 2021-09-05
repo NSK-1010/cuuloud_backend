@@ -32,7 +32,7 @@ class RoomNameSpace(Namespace):
 
     def on_get_all_rooms(self):
         if not session.get('login'):
-            emit('message', {'message': 'ログインが必要です'})
+            emit('notice', {'message': 'ログインが必要です'})
             return
         room_schema = RoomSchema(many=True)
         emit('rooms', room_schema.dump(Room.query.all()))
@@ -47,11 +47,11 @@ class RoomNameSpace(Namespace):
 
     def on_create_room(self, payload):
         if not session.get('login'):
-            emit('message', {'message': 'ログインが必要です。'})
+            emit('notice', {'message': 'ログインが必要です。'})
             return
         name = payload.get('name')
         if not name.split():
-            emit('message', {'message': '部屋の名前を入力してください。'})
+            emit('notice', {'message': '部屋の名前を入力してください。'})
             return
         room = randomstr.randomstr(20)
         while Room.query.filter(Room.id == room).first():
@@ -74,12 +74,12 @@ class RoomNameSpace(Namespace):
 
     def on_join_room(self, payload):
         if not session.get('login'):
-            emit('message', {'message': 'ログインが必要です。'})
+            emit('notice', {'message': 'ログインが必要です。'})
             return
         room = payload.get('room')
         target = Room.query.filter(Room.id == room).first()
         if not target:
-            emit('message', {'message': 'この部屋は存在しません。'})
+            emit('notice', {'message': 'この部屋は存在しません。'})
             room_schema = RoomSchema(many=True)
             emit('rooms', room_schema.dump(Room.query.all()), broadcast=True)
             return
@@ -101,13 +101,13 @@ class RoomNameSpace(Namespace):
 
     def on_leave_room(self, payload):
         if not session.get('login'):
-            emit('message', {'message': 'ログインが必要です。'})
+            emit('notice', {'message': 'ログインが必要です。'})
             return
         room = payload.get('room')
         my_join = Join.query.filter(Join.user_id == session.get(
             'id'), Join.room_id == room).first()
         if not my_join:
-            emit('message', {'message': 'この部屋に参加してません。'})
+            emit('notice', {'message': 'この部屋に参加してません。'})
             return
         db.session.delete(my_join)
         leave_room(room)
@@ -128,7 +128,7 @@ class RoomNameSpace(Namespace):
 
     def on_message(self, payload):
         if not payload.get('text').split():
-            emit('message', {'message': '部屋の名前を入力してください。'})
+            emit('notice', {'message': '部屋の名前を入力してください。'})
             return
         emit('message', {'text': payload.get('text'), 'room_id': payload.get(
             "id"), 'created_at': datetime.datetime.now().isoformat(), 'user_id': session.get('user_id'), 'user_name': User.query.filter(User.id == session.get('id')).first().name}, room=payload.get('id'))
