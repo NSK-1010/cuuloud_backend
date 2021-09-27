@@ -5,7 +5,7 @@ Culoudへようこそ。
 
 本サービスへのご登録ありがとうございます。
 以下のURLから認証されます。
-'''+f'https://{url.url}/#/verify/'+'''{verify_code}
+'''+f'https://{url.url}/#/verify/'+'''{verify_token}
 '''
 }
 

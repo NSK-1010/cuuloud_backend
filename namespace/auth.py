@@ -1,13 +1,21 @@
 from flask_socketio import Namespace, emit, join_room, leave_room, close_room, rooms, disconnect
-from util import randomstr, crypt, user
+from util import randomstr, crypt, mail
 from engine import db
-from model import Room, RoomSchema, Join, User, Invite
+from model import RoomSchema, Join, User, Invite, Verify, verify
 from app import app, session
 from flask_session import Session
 Session(app)
 class AuthNameSpace(Namespace):
     def on_connect(self):
         print('connected(auth)')
+        if session.get('verify'):
+            verify = Verify.query.filter(Verify.token == session.get('verify')).first()
+            if verify:
+                verified_user = User.query.filter(User.id == verify.user_id).first()
+                emit('notice', {'message': 'メールアドレス認証が成功しました！'})
+                verified_user.verified = True
+                db.session.commit()
+                emit('login', {'login': session.get('login'), 'id': verify.user_id, 'name':verified_user.name})
         if session.get('login'):
             target = User.query.filter(User.id == session.get('id')).first()
             emit('login', {'login': session.get('login'), 'id': session.get('id'), 'name':target.name})
@@ -24,6 +32,9 @@ class AuthNameSpace(Namespace):
         target = User.query.filter(User.id == payload.get('id')).first()
         if (not target) or (not crypt.check(payload.get('password'), target.password)):
             emit('login_error', {'message': 'IDかパスワードが間違っています。'})
+            return
+        if not target.verified:
+            emit('login_error', {'message': 'メールアドレス認証が済まされていません。'})
             return
         session['id'] = payload.get('id')
         session['login'] = True
@@ -64,6 +75,7 @@ class AuthNameSpace(Namespace):
 
     def on_register(self, payload):
         if not payload.get('id').isascii():
+            emit('login_error', {'message': 'IDにはASCII文字しか使えません。'})
             return
         if User.query.filter(User.id == payload.get('id')).first():
             emit('login_error', {'message': '登録しようとしているIDがすでに存在します。'})
@@ -76,11 +88,15 @@ class AuthNameSpace(Namespace):
             emit('login_error', {'message': 'あなたは招待されていません。'})
             return
         password = crypt.hash(payload.get("password"))
-        new = User(id=payload.get('id'), name=payload.get("name"), email=payload.get("email"), password=password)
+        new = User(id=payload.get('id'), name=payload.get("name"), email=payload.get("email"), password=password, verified=False)
+        verify_token = randomstr.randomstr(10)
+        while Verify.query.filter(Verify.token == verify).first():
+            verify_token = randomstr.randomstr(10)
+        new_verify = Verify(token=verify_token, user_id=payload.get('id'))
         db.session.delete(target)
         db.session.add(new)
+        db.session.add(new_verify)
         session['id'] = payload.get('id')
-        session['login'] = True
         db.session.commit()
-        emit('notice', {'message': '登録完了しました。ようこそ！'})
-        emit('login', {'login': session.get('login'), 'id': payload.get('id'), 'name':payload.get("name")})
+        emit('notice', {'message': '登録されたメールアドレスから認証してください。'})
+        mail.send_template(payload.get('email'), verify_token=verify_token)
