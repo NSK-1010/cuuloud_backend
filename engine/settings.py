@@ -1,16 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
-from os import getenv
+from util import conf
 
-# db_user = getenv('DB_USER')
-db_user = 'root'
-# db_pass = getenv('DB_PASSWORD')
-db_pass = 'root'
-# db_host = getenv('DB_HOST')
-db_host = 'localhost'
-# db_name = getenv('DB_NAME')
-db_name = 'culoud'
+db_user = conf.db.get('user')
+db_pass = conf.db.get('pass')
+db_host = conf.db.get('host')
+db_name = conf.db.get('name')
 
 class DevelopmentConfig():
     DEBUG = True

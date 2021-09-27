@@ -1,7 +1,7 @@
-from os import getenv
+from util import conf
 
-domain = getenv('DOMAIN')
-if getenv('PROTOCOL') and getenv('PROTOCOL') == 'https':
+domain = conf.web.get('domain')
+if conf.web.ssl:
     url = f'https://{domain}/'
 else:
     url = f'http://{domain}/'

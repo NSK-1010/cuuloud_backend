@@ -1,5 +1,5 @@
 from flask_socketio import Namespace, emit, join_room, leave_room, close_room, rooms, disconnect
-from util import randomstr, crypt, mail
+from util import randomstr, crypt, mail, url
 from engine import db
 from model import RoomSchema, Join, User, Invite, Verify, verify
 from app import app, session
@@ -99,4 +99,4 @@ class AuthNameSpace(Namespace):
         session['id'] = payload.get('id')
         db.session.commit()
         emit('auth_error', {'message': '登録されたメールアドレスから認証してください。'})
-        mail.send_template(payload.get('email'), 'register', verify_token=verify_token)
+        mail.send_template(payload.get('email'), 'register', url=url.url, verify_token=verify_token)
