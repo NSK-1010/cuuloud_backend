@@ -99,4 +99,4 @@ class AuthNameSpace(Namespace):
         session['id'] = payload.get('id')
         db.session.commit()
         emit('auth_error', {'message': '登録されたメールアドレスから認証してください。'})
-        mail.send_template(payload.get('email'), verify_token=verify_token)
+        mail.send_template(payload.get('email'), 'register', verify_token=verify_token)
