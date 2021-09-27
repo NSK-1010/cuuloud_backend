@@ -31,10 +31,10 @@ class AuthNameSpace(Namespace):
         session['login'] = False
         target = User.query.filter(User.id == payload.get('id')).first()
         if (not target) or (not crypt.check(payload.get('password'), target.password)):
-            emit('login_error', {'message': 'IDかパスワードが間違っています。'})
+            emit('auth_error', {'message': 'IDかパスワードが間違っています。'})
             return
         if not target.verified:
-            emit('login_error', {'message': 'メールアドレス認証が済まされていません。'})
+            emit('auth_error', {'message': 'メールアドレス認証が済まされていません。'})
             return
         session['id'] = payload.get('id')
         session['login'] = True
@@ -75,17 +75,17 @@ class AuthNameSpace(Namespace):
 
     def on_register(self, payload):
         if not payload.get('id').isascii():
-            emit('login_error', {'message': 'IDにはASCII文字しか使えません。'})
+            emit('auth_error', {'message': 'IDにはASCII文字しか使えません。'})
             return
         if User.query.filter(User.id == payload.get('id')).first():
-            emit('login_error', {'message': '登録しようとしているIDがすでに存在します。'})
+            emit('auth_error', {'message': '登録しようとしているIDがすでに存在します。'})
             return
         if User.query.filter(User.email == payload.get("email")).first():
-            emit('login_error', {'message': 'このメールアドレスはすでに登録されています。'})
+            emit('auth_error', {'message': 'このメールアドレスはすでに登録されています。'})
             return
         target = Invite.query.filter(Invite.email == payload.get("email")).first()
         if not target:
-            emit('login_error', {'message': 'あなたは招待されていません。'})
+            emit('auth_error', {'message': 'あなたは招待されていません。'})
             return
         password = crypt.hash(payload.get("password"))
         new = User(id=payload.get('id'), name=payload.get("name"), email=payload.get("email"), password=password, verified=False)
@@ -98,5 +98,5 @@ class AuthNameSpace(Namespace):
         db.session.add(new_verify)
         session['id'] = payload.get('id')
         db.session.commit()
-        emit('login_error', {'message': '登録されたメールアドレスから認証してください。'})
+        emit('auth_error', {'message': '登録されたメールアドレスから認証してください。'})
         mail.send_template(payload.get('email'), verify_token=verify_token)
