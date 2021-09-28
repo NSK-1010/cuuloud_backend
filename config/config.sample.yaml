@@ -4,13 +4,13 @@ db:
   port:
     "3306"
   dbname:
-    "culoud"
+    "cuuloud"
   user:
-    "root"
+    "cuuloud"
   pass:
-    "root"
+    "cuuloud" #you should change this
 web:
   domain:
-    "localhost:5000"
+    "example.tld"
   ssl:
-    no
+    yes
