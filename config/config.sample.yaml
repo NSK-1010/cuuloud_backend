@@ -1,0 +1,16 @@
+db:
+  host:
+    "127.0.0.1"
+  port:
+    "3306"
+  dbname:
+    "culoud"
+  user:
+    "root"
+  pass:
+    "root"
+web:
+  domain:
+    "localhost:5000"
+  ssl:
+    no

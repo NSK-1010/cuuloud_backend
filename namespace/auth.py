@@ -12,10 +12,12 @@ class AuthNameSpace(Namespace):
             verify = Verify.query.filter(Verify.token == session.get('verify')).first()
             if verify:
                 verified_user = User.query.filter(User.id == verify.user_id).first()
-                emit('notice', {'message': 'メールアドレス認証が成功しました！'})
+                emit('notice', {'message': 'メールアドレス認証が成功しました！ログインをして、サービスをお楽しみください！'})
                 verified_user.verified = True
+                db.session.delete(verify)
                 db.session.commit()
-                emit('login', {'login': session.get('login'), 'id': verify.user_id, 'name':verified_user.name})
+                emit('login', {'login': False, 'id': None, 'name':None})
+                session['verify'] = None
         if session.get('login'):
             target = User.query.filter(User.id == session.get('id')).first()
             emit('login', {'login': session.get('login'), 'id': session.get('id'), 'name':target.name})

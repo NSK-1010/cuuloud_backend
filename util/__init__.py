@@ -1,9 +1,8 @@
-from . import crypt, user, error, url, randomstr, conf
+from . import crypt, error, url, randomstr
 
 __all__ = [
     "crypt",
     "error",
     "url",
     "randomstr",
-    "conf"
 ]

@@ -15,4 +15,4 @@
 /Scripts/*
 /share/*sk
 /pyvenv.cfg
-/static/images/*
+/config/config.yml

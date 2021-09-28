@@ -1,12 +1,12 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_migrate import Migrate
-from util import conf
+from config import conf
 
 db_user = conf.db.get('user')
 db_pass = conf.db.get('pass')
 db_host = conf.db.get('host')
-db_name = conf.db.get('name')
+db_name = conf.db.get('dbname')
 
 class DevelopmentConfig():
     DEBUG = True
