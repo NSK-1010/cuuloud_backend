@@ -20,6 +20,7 @@ class AuthNameSpace(Namespace):
                 session['verify'] = None
         if session.get('login'):
             target = User.query.filter(User.id == session.get('id')).first()
+            target.ip = session.get('ip')
             emit('login', {'login': session.get('login'), 'id': session.get('id'), 'name':target.name})
         else:
             emit('login', {'login': False, 'id': None, 'name':None})
