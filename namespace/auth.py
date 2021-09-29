@@ -20,7 +20,8 @@ class AuthNameSpace(Namespace):
                 session['verify'] = None
         if session.get('login'):
             target = User.query.filter(User.id == session.get('id')).first()
-            target.ip = session.get('ip')
+            target.ip = str(session.get('ip'))
+            db.session.commit()
             emit('login', {'login': session.get('login'), 'id': session.get('id'), 'name':target.name})
         else:
             emit('login', {'login': False, 'id': None, 'name':None})
@@ -36,6 +37,8 @@ class AuthNameSpace(Namespace):
         if (not target) or (not crypt.check(payload.get('password'), target.password)):
             emit('auth_error', {'message': 'IDかパスワードが間違っています。'})
             return
+        target.ip = str(session.get('ip'))
+        db.session.commit()
         if not target.verified:
             emit('auth_error', {'message': 'メールアドレス認証が済まされていません。'})
             return
