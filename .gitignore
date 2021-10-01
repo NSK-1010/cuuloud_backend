@@ -12,6 +12,7 @@
 /flask_session/
 /flask_session/*
 /*/__pycache__/*
+/*/*/__pycache__/*
 /Scripts/*
 /share/*sk
 /pyvenv.cfg
