@@ -56,14 +56,14 @@ class RoomNameSpace(Namespace):
         room = randomstr.randomstr(20)
         while Room.query.filter(Room.id == room).first():
             room = randomstr.randomstr(20)
-        new_room = Room(id=room, name=name)
+        me = User.query.filter(User.id == session.get('id')).first()
+        new_room = Room(id=room, name=name, host_id=session.get('id'), host_name=me.name)
         new_join = Join(user_id=session.get('id'), room_id=room)
         db.session.add(new_room)
         db.session.add(new_join)
         db.session.commit()
         join_room(room)
-        emit('join', {'user_id': session.get('id'), 'text':None, 'user_name': User.query.filter(
-            User.id == session.get('id')).first().name, 'created_at': datetime.datetime.now().isoformat(), 'room_id': room}, room=room)
+        emit('join', {'user_id': session.get('id'), 'text':None, 'user_name': me.name, 'created_at': datetime.datetime.now().isoformat(), 'room_id': room}, room=room)
         my_join_data = Join.query.filter(Join.user_id == session.get('id')).all()
         room_schema = RoomSchema(many=False)
         my_join_rooms = [room_schema.dump(Room.query.filter(
@@ -131,5 +131,5 @@ class RoomNameSpace(Namespace):
             emit('notice', {'message': '発言を入力してください。'})
             return
         emit('message', {'text': payload.get('text'), 'room_id': payload.get(
-            "id"), 'created_at': datetime.datetime.now().isoformat(), 'user_id': session.get('user_id'), 'user_name': User.query.filter(User.id == session.get('id')).first().name}, room=payload.get('id'))
+            "id"), 'created_at': datetime.datetime.now().isoformat(), 'user_id': session.get('id'), 'user_name': User.query.filter(User.id == session.get('id')).first().name}, room=payload.get('id'))
         
