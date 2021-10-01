@@ -14,3 +14,14 @@ web:
     "example.tld"
   ssl:
     yes
+smtp:
+  host:
+    "mail.example.tld"
+  port:
+    465
+  address:
+    "cuuloud@example.tld"
+  user:
+    "cuuloud@example.tld"
+  pass:
+    "example"
