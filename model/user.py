@@ -8,7 +8,9 @@ class User(db.Model):
     name = db.Column(db.Unicode(length=255))
     email = db.Column(db.Unicode(length=255), unique=True)
     icon = db.Column(db.Unicode(length=255))
-    
+    verified = db.Column(db.Boolean(), default=False)
+    ip = db.Column(db.String(length=15))
+
     invitation_times_limit = db.Column(db.Integer, default=3)
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.now)
 

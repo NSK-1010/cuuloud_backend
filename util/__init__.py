@@ -1,9 +1,10 @@
-from . import crypt, user, error, url, randomstr
+from . import crypt, error, url, randomstr
+from .mail import mail
 
 __all__ = [
     "crypt",
-    "user",
     "error",
     "url",
-    "randomstr"
+    "randomstr",
+    'mail'
 ]
