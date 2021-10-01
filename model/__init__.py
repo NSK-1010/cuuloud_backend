@@ -2,6 +2,7 @@ from .user import User, UserSchema
 from .room import Room, RoomSchema
 from .invite import Invite, InviteSchema
 from .join import Join, JoinSchema
+from .verify import Verify, VerifySchema
 
 __all__ = [
     "User",
@@ -11,5 +12,7 @@ __all__ = [
     "Invite",
     "InviteSchema",
     "Join",
-    "JoinSchema"
+    "JoinSchema",
+    "Verify",
+    "VerifySchema"
 ]
