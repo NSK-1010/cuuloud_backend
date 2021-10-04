@@ -3,8 +3,8 @@ from model import *
 from flask import Flask, session
 from flask_session import Session
 from engine import init_db
-import os
 import logging
+from config import conf
 from flask_socketio import SocketIO
 
 async_mode = None
@@ -33,5 +33,7 @@ def create_app():
     return app
 
 app = create_app()
-
-socketio = SocketIO(app, async_mode=async_mode, manage_session=False)
+if conf.redis:
+    socketio = SocketIO(app, async_mode=async_mode, manage_session=False, message_queue=f'redis://{conf.redis.get('host')}:{conf.redis.get('port')}')
+else:
+    socketio = SocketIO(app, async_mode=async_mode, manage_session=False)
