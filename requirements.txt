@@ -8,3 +8,6 @@ uwsgi
 bcrypt
 pyyaml
 pymysql
+redis
+gevent
+gunicorn
