@@ -4,7 +4,6 @@ flask_sqlalchemy
 flask_marshmallow
 flask_migrate
 flask_socketio
-uwsgi
 bcrypt
 pyyaml
 pymysql
