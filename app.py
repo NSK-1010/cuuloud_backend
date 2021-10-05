@@ -34,6 +34,8 @@ def create_app():
 
 app = create_app()
 if conf.redis:
-    socketio = SocketIO(app, async_mode=async_mode, manage_session=False, message_queue=f'redis://{conf.redis.get('host')}:{conf.redis.get('port')}')
+    redis_host = conf.redis.get('host')
+    redis_port = conf.redis.get('port')
+    socketio = SocketIO(app, async_mode=async_mode, manage_session=False, message_queue=f'redis://{redis_host}:{redis_port}')
 else:
     socketio = SocketIO(app, async_mode=async_mode, manage_session=False)
