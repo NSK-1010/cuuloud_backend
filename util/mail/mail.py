@@ -1,6 +1,7 @@
 import os.path
 import smtplib
 from email import message
+from email.utils import formatdate
 from config import conf
 
 def send(email, subject, text):
@@ -10,6 +11,7 @@ def send(email, subject, text):
     msg.set_content(text)
     msg['Subject'] = subject
     msg['From'] = conf.smtp.get('address')
+    msg['Date'] = formatdate()
     msg['To'] = email
     s.send_message(msg)
     s.quit()
