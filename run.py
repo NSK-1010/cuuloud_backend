@@ -10,7 +10,7 @@ def index():
 @app.route('/verify/<id>')
 def verify(id):
     session['verify'] = id
-    return redirect(url_for('index'))
+    return redirect('/')
 
 @app.route('/favicon.ico')
 def favicon():
