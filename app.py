@@ -18,7 +18,7 @@ def create_app():
     app.config['SECRET_KEY'] = b'p\x80\xccR\x99\x1f\x0f\xb8\x97\x8e\xe0L\x1b\x14^?'
     
     #Flask Config
-    app.config.from_object('engine.DevelopmentConfig')
+    app.config.from_object('engine.Config')
 
     #sqlalchemy log setting
     logging.basicConfig()
