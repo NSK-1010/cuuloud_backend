@@ -77,6 +77,7 @@ class AuthNameSpace(Namespace):
         new = Invite(user_id=session.get('id'), email=email)
         db.session.add(new)
         db.session.commit()
+        mail.send_template(payload.get('email'), 'Cuuloud　メール認証の確認', 'invite', url=url.url, name=User.query.filter(User.id == session.get('id')).first().name)
         emit('notice', {'message': '招待が完了しました。'})
 
     def on_register(self, payload):
