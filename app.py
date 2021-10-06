@@ -6,6 +6,7 @@ from engine import init_db
 import logging
 from config import conf
 from flask_socketio import SocketIO
+from gevent import monkey
 
 async_mode = None
 
@@ -39,3 +40,5 @@ if conf.redis:
     socketio = SocketIO(app, async_mode=async_mode, manage_session=False, message_queue=f'redis://{redis_host}:{redis_port}')
 else:
     socketio = SocketIO(app, async_mode=async_mode, manage_session=False)
+
+monkey.patch_all()
