@@ -55,6 +55,17 @@ class AuthNameSpace(Namespace):
         session['login'] = False
         emit('login', {'login': session.get('login'), 'id': session.get('id')})
 
+    def on_apply_settings(self, payload):
+        if not session.get('login'):
+            emit('notice', {'message': 'ログインが必要です。'})
+            return
+        me = User.query.filter(User.id == session.get('id')).first()
+        if payload.get('changedName'):
+            me.name = payload.get('name')
+            db.session.commit()
+        emit('changed_settings', {'name':me.name})
+
+
     def on_invite(self, payload):
         if not session.get('login'):
             emit('notice', {'message': 'ログインが必要です。'})
