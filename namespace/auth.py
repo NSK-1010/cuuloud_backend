@@ -60,10 +60,11 @@ class AuthNameSpace(Namespace):
             emit('notice', {'message': 'ログインが必要です。'})
             return
         me = User.query.filter(User.id == session.get('id')).first()
-        if payload.get('changedName'):
+        if payload.get('changedName') and payload.get('name').split():
             me.name = payload.get('name')
             db.session.commit()
         emit('changed_settings', {'name':me.name})
+        emit('notice', {'message': '設定を適用しました。'})
 
 
     def on_invite(self, payload):
