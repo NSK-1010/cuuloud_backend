@@ -10,34 +10,38 @@ from gevent import monkey
 
 async_mode = 'gevent'
 
+
 def create_app():
 
-    app = Flask(__name__, static_folder='../dist/static', static_url_path='/static', template_folder='../dist')
+    app = Flask(__name__, static_folder='../dist/static',
+                static_url_path='/static', template_folder='../dist')
 
-    #SECRET_KEY
+    # SECRET_KEY
     app.config['SECRET_KEY'] = b'p\x80\xccR\x99\x1f\x0f\xb8\x97\x8e\xe0L\x1b\x14^?'
-    
-    #Flask Config
+
+    # Flask Config
     app.config.from_object('engine.Config')
 
-    #sqlalchemy log setting
+    # sqlalchemy log setting
     logging.basicConfig()
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     logging.getLogger('sqlalchemy.orm.unitofwork').setLevel(logging.DEBUG)
 
-    #database.py
+    # database.py
     init_db(app)
-    
-    #Flask session
+
+    # Flask session
     app.config['SESSION_TYPE'] = 'filesystem'
 
     return app
+
 
 app = create_app()
 if conf.redis:
     redis_host = conf.redis.get('host')
     redis_port = conf.redis.get('port')
-    socketio = SocketIO(app, async_mode=async_mode, manage_session=False, message_queue=f'redis://{redis_host}:{redis_port}')
+    socketio = SocketIO(app, async_mode=async_mode, manage_session=False,
+                        message_queue=f'redis://{redis_host}:{redis_port}')
 else:
     socketio = SocketIO(app, async_mode=async_mode, manage_session=False)
 

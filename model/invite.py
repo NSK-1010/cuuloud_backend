@@ -1,5 +1,6 @@
-from engine.settings import db,ma
+from engine.settings import db, ma
 from datetime import datetime
+
 
 class Invite(db.Model):
     id = db.Column(db.BigInteger, primary_key=True, autoincrement=True)
@@ -8,7 +9,7 @@ class Invite(db.Model):
     created_at = db.Column(db.DateTime(timezone=True), default=datetime.now)
 
     __tablename__ = 'invite'
-    
+
 
 class InviteSchema(ma.Schema):
     class Meta:
