@@ -1,5 +1,6 @@
 from flask_socketio import Namespace, emit, join_room, leave_room, close_room, rooms, disconnect
 from util import randomstr, crypt
+from config import conf
 from engine import db
 from model import Room, RoomSchema, Join, User, Invite
 from app import app, session
@@ -49,22 +50,35 @@ class RoomNameSpace(Namespace):
         if not session.get('login'):
             emit('notice', {'message': 'ログインが必要です。'})
             return
-        name = payload.get('name')
-        if not name.split():
+        if not payload.get('name').split():
             emit('notice', {'message': '部屋の名前を入力してください。'})
             return
+        before_created = Room.query.filter(
+            Room.host_id == session.get('id')).first()
+        if before_created:
+            limit = datetime.timedelta(minutes=conf.app.get('lim_min_createroom'))
+            if datetime.datetime.now() - before_created.created_at < limit:
+                emit('notice', {
+                     'message': f'''一度にたくさんの部屋は作れません。
+                     あと{round(((limit - (datetime.datetime.now() - before_created.created_at)).seconds)/60)}分ほどお待ちください。'''})
+                return
+            else:
+                del limit, before_created
         room = randomstr.randomstr(20)
         while Room.query.filter(Room.id == room).first():
             room = randomstr.randomstr(20)
         me = User.query.filter(User.id == session.get('id')).first()
-        new_room = Room(id=room, name=name, host_id=session.get('id'), host_name=me.name)
+        new_room = Room(id=room, name=payload.get('name'),
+                        host_id=session.get('id'), host_name=me.name)
         new_join = Join(user_id=session.get('id'), room_id=room)
         db.session.add(new_room)
         db.session.add(new_join)
         db.session.commit()
         join_room(room)
-        emit('join', {'user_id': session.get('id'), 'text':None, 'user_name': me.name, 'created_at': datetime.datetime.now().isoformat(), 'room_id': room}, room=room)
-        my_join_data = Join.query.filter(Join.user_id == session.get('id')).all()
+        emit('join', {'user_id': session.get('id'), 'text': None, 'user_name': me.name,
+             'created_at': datetime.datetime.now().isoformat(), 'room_id': room}, room=room)
+        my_join_data = Join.query.filter(
+            Join.user_id == session.get('id')).all()
         room_schema = RoomSchema(many=False)
         my_join_rooms = [room_schema.dump(Room.query.filter(
             Room.id == r.room_id).first()) for r in my_join_data]
@@ -91,12 +105,13 @@ class RoomNameSpace(Namespace):
         db.session.add(new_join)
         join_room(room)
         db.session.commit()
-        my_join_data = Join.query.filter(Join.user_id == session.get('id')).all()
+        my_join_data = Join.query.filter(
+            Join.user_id == session.get('id')).all()
         room_schema = RoomSchema(many=False)
         my_join_rooms = [room_schema.dump(Room.query.filter(
             Room.id == r.room_id).first()) for r in my_join_data]
         emit('joinned_rooms', my_join_rooms)
-        emit('join', {'room_id': room, 'created_at': datetime.datetime.now().isoformat(), 'text':None, 'user_id': session.get('id'), 'user_name': User.query.filter(
+        emit('join', {'room_id': room, 'created_at': datetime.datetime.now().isoformat(), 'text': None, 'user_id': session.get('id'), 'user_name': User.query.filter(
             User.id == session.get('id')).first().name}, room=room)
 
     def on_leave_room(self, payload):
@@ -111,10 +126,11 @@ class RoomNameSpace(Namespace):
             return
         db.session.delete(my_join)
         leave_room(room)
-        emit('leave', {'room_id': room, 'created_at': datetime.datetime.now().isoformat(), 'text':None, 'user_id': session.get('id'), 'user_name': User.query.filter(
+        emit('leave', {'room_id': room, 'created_at': datetime.datetime.now().isoformat(), 'text': None, 'user_id': session.get('id'), 'user_name': User.query.filter(
             User.id == session.get('id')).first().name}, room=room)
         db.session.commit()
-        my_join_data = Join.query.filter(Join.user_id == session.get('id')).all()
+        my_join_data = Join.query.filter(
+            Join.user_id == session.get('id')).all()
         room_schema = RoomSchema(many=False)
         my_join_rooms = [room_schema.dump(Room.query.filter(
             Room.id == r.room_id).first()) for r in my_join_data]
@@ -132,4 +148,3 @@ class RoomNameSpace(Namespace):
             return
         emit('message', {'text': payload.get('text'), 'room_id': payload.get(
             "id"), 'created_at': datetime.datetime.now().isoformat(), 'user_id': session.get('id'), 'user_name': User.query.filter(User.id == session.get('id')).first().name}, room=payload.get('id'))
-        
