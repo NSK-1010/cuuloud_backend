@@ -56,7 +56,8 @@ class RoomNameSpace(Namespace):
         before_created = Room.query.filter(
             Room.host_id == session.get('id')).first()
         if before_created:
-            limit = datetime.timedelta(minutes=conf.app.get('lim_min_createroom'))
+            limit = datetime.timedelta(
+                minutes=conf.app.get('lim_min_createroom'))
             if datetime.datetime.now() - before_created.created_at < limit:
                 emit('notice', {
                      'message': f'''一度にたくさんの部屋は作れません。

@@ -4,19 +4,24 @@ from namespace import *
 from flask_session import Session
 from util import url
 Session(app)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/verify/<id>')
 def verify(id):
     session['verify'] = id
     return redirect(url.url)
 
+
 @app.route('/favicon.ico')
 def favicon():
     session['ip'] = request.headers.get('X-Forwarded-For', request.remote_addr)
     return send_file('../dist/favicon.png')
+
 
 socketio.on_namespace(auth.AuthNameSpace('/auth'))
 socketio.on_namespace(room.RoomNameSpace('/room'))
