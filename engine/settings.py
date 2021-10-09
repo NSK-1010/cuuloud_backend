@@ -8,6 +8,7 @@ db_pass = conf.db.get('pass')
 db_host = conf.db.get('host')
 db_name = conf.db.get('dbname')
 
+
 class DevelopmentConfig():
     DEBUG = True
     # SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/gpsns'
@@ -16,9 +17,11 @@ class DevelopmentConfig():
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = True
 
+
 class Config(DevelopmentConfig):
     DEBUG = False
     SQLALCHEMY_ECHO = False
+
 
 db = SQLAlchemy()
 ma = Marshmallow()
