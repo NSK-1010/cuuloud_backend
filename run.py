@@ -2,6 +2,7 @@ from flask import render_template, send_file, redirect, url_for, request
 from app import app, socketio, session
 from namespace import *
 from flask_session import Session
+from util import url
 Session(app)
 @app.route('/')
 def index():
@@ -10,7 +11,7 @@ def index():
 @app.route('/verify/<id>')
 def verify(id):
     session['verify'] = id
-    return redirect('/')
+    return redirect(url.url)
 
 @app.route('/favicon.ico')
 def favicon():

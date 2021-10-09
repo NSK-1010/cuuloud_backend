@@ -8,7 +8,7 @@ from config import conf
 from flask_socketio import SocketIO
 from gevent import monkey
 
-async_mode = None
+async_mode = 'gevent'
 
 def create_app():
 

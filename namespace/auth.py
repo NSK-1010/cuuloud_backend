@@ -55,6 +55,18 @@ class AuthNameSpace(Namespace):
         session['login'] = False
         emit('login', {'login': session.get('login'), 'id': session.get('id')})
 
+    def on_apply_settings(self, payload):
+        if not session.get('login'):
+            emit('notice', {'message': 'ログインが必要です。'})
+            return
+        me = User.query.filter(User.id == session.get('id')).first()
+        if payload.get('changedName') and payload.get('name').split():
+            me.name = payload.get('name')
+            db.session.commit()
+        emit('changed_settings', {'name':me.name})
+        emit('notice', {'message': '設定を適用しました。'})
+
+
     def on_invite(self, payload):
         if not session.get('login'):
             emit('notice', {'message': 'ログインが必要です。'})
@@ -77,7 +89,8 @@ class AuthNameSpace(Namespace):
         new = Invite(user_id=session.get('id'), email=email)
         db.session.add(new)
         db.session.commit()
-        mail.send_template(payload.get('email'), 'Cuuloud　メール認証の確認', 'invite', url=url.url, name=User.query.filter(User.id == session.get('id')).first().name)
+        me = User.query.filter(User.id == session.get('id')).first()
+        mail.send_template(payload.get('email'), f'{me.name}からCuuloudへの招待が届きました！', 'invite', url=url.url, name=me.name)
         emit('notice', {'message': '招待が完了しました。'})
 
     def on_register(self, payload):
@@ -93,6 +106,12 @@ class AuthNameSpace(Namespace):
         target = Invite.query.filter(Invite.email == payload.get("email")).first()
         if not target:
             emit('auth_error', {'message': 'あなたは招待されていません。'})
+            return
+        if len(payload.get('name')) > 10:
+            emit('auth_error', {'message': '名前が長すぎます。'})
+            return
+        if len(payload.get('id')) > 15:
+            emit('auth_error', {'message': 'IDが長すぎます。'})
             return
         password = crypt.hash(payload.get("password"))
         new = User(id=payload.get('id'), name=payload.get("name"), email=payload.get("email"), password=password, verified=False)
