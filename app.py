@@ -12,22 +12,21 @@ async_mode = 'gevent'
 
 
 def create_app():
+    #Flask app
+    app = Flask(__name__, static_folder='../dist/static', static_url_path='/static', template_folder='../dist')
 
-    app = Flask(__name__, static_folder='../dist/static',
-                static_url_path='/static', template_folder='../dist')
-
-    # SECRET_KEY
-    app.config['SECRET_KEY'] = b'p\x80\xccR\x99\x1f\x0f\xb8\x97\x8e\xe0L\x1b\x14^?'
-
-    # Flask Config
+    #Secret Key
+    app.config['SECRET_KEY'] = b'you must change'
+    
+    #Flask Config
     app.config.from_object('engine.Config')
 
-    # sqlalchemy log setting
+    #Sqlalchemy log setting
     logging.basicConfig()
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
     logging.getLogger('sqlalchemy.orm.unitofwork').setLevel(logging.DEBUG)
 
-    # database.py
+    #Database init
     init_db(app)
 
     # Flask session
@@ -45,4 +44,5 @@ if conf.redis:
 else:
     socketio = SocketIO(app, async_mode=async_mode, manage_session=False)
 
+#gevent
 monkey.patch_all()
